@@ -183,6 +183,23 @@ if (isASCII && ! $::is64bit) {    # 32-bit ASCII platform
             7, 2,
             qr/overflows/
         ],
+        [ "overlong malformation, but naively looks like overflow",
+            "\xff\x80\x80\x80\x80\x80\x80\x83\xbf\xbf\xbf\xbf\xbf",
+            13,  # Represents 2**32-1
+            $::UTF8_ALLOW_LONG, $::UTF8_GOT_LONG,
+            0xFFFFFFFF,
+            $::max_bytes, 1,
+            qr/overlong/
+        ],
+        [ "both overlong and overflow malformations",
+            "\xff\x80\x80\x80\x80\x80\x80\x84\x80\x80\x80\x80\x80",
+            13,  # Represents 2**32
+            $::UTF8_ALLOW_LONG|$::UTF8_ALLOW_OVERFLOW,
+            $::UTF8_GOT_LONG|$::UTF8_GOT_OVERFLOW,
+            $REPLACEMENT,
+            $::max_bytes, 1,
+            [ qr/overflow/, qr/overlong/ ],
+        ],
         [ "overflow malformation",
             "\xff\x80\x80\x80\x80\x80\x81\x80\x80\x80\x80\x80\x80",
             $::max_bytes,
