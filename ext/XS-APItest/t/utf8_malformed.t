@@ -343,16 +343,22 @@ foreach my $test (@malformations) {
     is($ret_ref->[1], $expected_len,
        "$testname: utf8n_to_uvchr_error(), disallowed: Returns expected"
      . " length: $expected_len");
-    if (is(scalar @warnings, 1,
-           "$testname: disallowed: Got a single warning "))
+
+    my @messages = (ref $message eq 'ARRAY')
+                    ?  @$message
+                    : ( $message );
+    if (is(scalar @warnings, scalar @messages,
+           "$testname: disallowed: Got expected number of warnings"))
     {
-        like($warnings[0], $message,
-             "$testname: disallowed: Got expected warning");
+        # Test that warnings come out in a particular order, though the API
+        # doesn't guarantee that, so this test could be relaxed.
+        for (my $i = 0; $i < @warnings; $i++) {
+            like($warnings[$i], $messages[$i],
+             "$testname: disallowed: Got expected warning, in order");
+        }
     }
     else {
-        if (scalar @warnings) {
-            output_warnings(@warnings);
-        }
+        output_warnings(@warnings);
     }
     is($ret_ref->[2], $expected_error_flags,
        "$testname: utf8n_to_uvchr_error(), disallowed:"
