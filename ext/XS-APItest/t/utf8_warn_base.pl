@@ -896,14 +896,20 @@ foreach my $test (@tests) {
                         }
                     }
                     else {
-                    no_warnings_expected:
-                        unless (is(scalar @warnings, 0,
-                                "$this_name: Got no warnings"))
-                        {
-                            diag $call;
-                            output_warnings(@warnings);
-                        }
+                      goto no_warnings_expected;
                     }
+
+                    goto post_no_warnings_expected;
+
+                  no_warnings_expected:
+                    unless (is(scalar @warnings, 0,
+                            "$this_name: Got no warnings"))
+                    {
+                        diag $call;
+                        output_warnings(@warnings);
+                    }
+
+                  post_no_warnings_expected:
 
                     # Check CHECK_ONLY results when the input is
                     # disallowed.  Do this when actually disallowed,
