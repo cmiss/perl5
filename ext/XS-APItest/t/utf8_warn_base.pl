@@ -544,6 +544,13 @@ foreach my $test (@tests) {
         $category, $allowed_uv, $expected_len, $needed_to_discern_len, $message
        ) = @$test;
 
+
+    unless (defined $message) {
+        fail("Internal error in $0: missing expected message in test"
+            . " '$testname'");
+        next;
+    }
+
     my $length = length $bytes;
     my $will_overflow = $testname =~ /overflow/ ? 'overflow' : "";
 
