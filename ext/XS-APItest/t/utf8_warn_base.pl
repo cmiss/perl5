@@ -544,7 +544,6 @@ foreach my $test (@tests) {
         $category, $allowed_uv, $expected_len, $needed_to_discern_len, $message
        ) = @$test;
 
-
     unless (defined $message) {
         fail("Internal error in $0: missing expected message in test"
             . " '$testname'");
@@ -715,29 +714,29 @@ foreach my $test (@tests) {
                         # Coerce the input into the desired
                         # malformation
 
-                            # For an overlong, we convert the original
-                            # start byte into a continuation byte with
-                            # the same data bits as originally. ...
-                            substr($this_bytes, 0, 1)
-                                = start_byte_to_cont(substr($this_bytes,
-                                                            0, 1));
+                        # For an overlong, we convert the original start byte
+                        # into a continuation byte with the same data bits as
+                        # originally. ...
+                        substr($this_bytes, 0, 1)
+                            = start_byte_to_cont(substr($this_bytes,
+                                                        0, 1));
 
-                            # ... Then we prepend it with a known
-                            # overlong sequence.  This should evaluate
-                            # to the exact same code point as the
-                            # original.
-                            $this_bytes
-                            = I8_to_native("\xff")
-                            . (I8_to_native(chr $::first_continuation)
-                            x ( $::max_bytes - 1 - length($this_bytes)))
-                            . $this_bytes;
-                            $this_length = length($this_bytes);
-                            $this_needed_to_discern_len
-                                 = $::max_bytes - ($this_expected_len
-                                               - $this_needed_to_discern_len);
-                            $this_expected_len = $::max_bytes;
-                            push @expected_errors, $::UTF8_GOT_LONG;
-                        }
+                        # ... Then we prepend it with a known overlong
+                        # sequence.  This should evaluate to the exact same
+                        # code point as the original.
+                        $this_bytes
+                        = I8_to_native("\xff")
+                        . (I8_to_native(chr $::first_continuation)
+                        x ( $::max_bytes - 1 - length($this_bytes)))
+                        . $this_bytes;
+                        $this_length = length($this_bytes);
+                        $this_needed_to_discern_len
+                                = $::max_bytes - ($this_expected_len
+                                            - $this_needed_to_discern_len);
+                        $this_expected_len = $::max_bytes;
+                        push @expected_errors, $::UTF8_GOT_LONG;
+                    }
+
                     my $expected_error_uv = sprintf("%04X", $allowed_uv);
 
                     my $malformations_name = join "/", @malformations;
@@ -862,7 +861,7 @@ foreach my $test (@tests) {
                             foreach (my $i = 0; $i < @warnings; $i++) {
                                 if ($warnings[$i] =~ /$malformation/) {
                                     pass("Expected and got"
-                                    . " '$malformation' warning");
+                                       . " '$malformation' warning");
                                     if ($warning_contains_code_point) {
                                         like($warnings[$i],
                                              qr/$expected_error_uv/,
