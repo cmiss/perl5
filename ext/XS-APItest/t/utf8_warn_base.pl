@@ -783,20 +783,19 @@ foreach my $test (@tests) {
                     $this_name .= ", " . (($warn_flag)
                                         ? 'with warning flag'
                                         : 'no warning flag');
+                    $this_name .= " ($malformations_name)";
 
                     undef @warnings;
                     my $ret_ref;
                     my $display_bytes = display_bytes($this_bytes);
+                    my $hex_flags =
+                       sprintf("0x%x", $warn_flag|$disallow_flag);
                     my $call = "    Call was: $eval_warn; \$ret_ref"
                             . " = test_utf8n_to_uvchr_error("
-                            . "'$display_bytes', $this_length,"
-                            . "$warn_flag"
-                            . "|$disallow_flag)";
+                            . "$display_bytes, $this_length, $hex_flags)";
                     my $eval_text =      "$eval_warn; \$ret_ref"
                             . " = test_utf8n_to_uvchr_error("
-                            . "'$this_bytes',"
-                            . " $this_length, $warn_flag"
-                            . "|$disallow_flag)";
+                            . "'$this_bytes', $this_length, $hex_flags)";
                     eval "$eval_text";
                     if (! ok ("$@ eq ''",
                         "$this_name: eval succeeded"))
@@ -823,7 +822,7 @@ foreach my $test (@tests) {
 
                     for (my $i = @expected_errors - 1; $i >= 0; $i--) {
                         if (ok($expected_errors[$i] & $errors,
-                            "Expected and got error bit return"
+                            "Expected and got error flag return"
                             . " for $malformations[$i] malformation"))
                         {
                             $errors &= ~$expected_errors[$i];
@@ -831,7 +830,7 @@ foreach my $test (@tests) {
                         splice @expected_errors, $i, 1;
                     }
                     is(scalar @expected_errors, 0,
-                            "Got all the expected malformation errors")
+                            "Got all the expected malformation error flags")
                       or diag Dumper \@expected_errors;
 
                     if (   $this_expected_len >= $this_needed_to_discern_len
@@ -857,7 +856,7 @@ foreach my $test (@tests) {
                             foreach (my $i = 0; $i < @warnings; $i++) {
                                 if ($warnings[$i] =~ /$malformation/) {
                                     pass("Expected and got"
-                                    . "'$malformation' warning");
+                                    . " '$malformation' warning");
                                     splice @warnings, $i, 1;
                                     next MALFORMATION;
                                 }
