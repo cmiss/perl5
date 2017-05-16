@@ -697,6 +697,7 @@ foreach my $test (@tests) {
                     my $expected_uv = $allowed_uv;
                     my $this_expected_len = $expected_len;
                     my $this_needed_to_discern_len = $needed_to_discern_len;
+                    my $allow_flag = 0;
 
                     # The overflow malformation test in the input
                     # array is coerced into being treated like one of
@@ -790,7 +791,7 @@ foreach my $test (@tests) {
                     my $ret_ref;
                     my $display_bytes = display_bytes($this_bytes);
                     my $hex_flags =
-                       sprintf("0x%x", $warn_flag|$disallow_flag);
+                       sprintf("0x%x", $allow_flag|$warn_flag|$disallow_flag);
                     my $call = "    Call was: $eval_warn; \$ret_ref"
                             . " = test_utf8n_to_uvchr_error("
                             . "$display_bytes, $this_length, $hex_flags)";
