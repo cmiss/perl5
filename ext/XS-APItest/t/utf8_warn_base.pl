@@ -692,6 +692,12 @@ foreach my $test (@tests) {
                                                       if $unexpected_noncont;
                     push @malformations, $overlong if $overlong;
 
+                    my $this_bytes = $bytes;
+                    my $this_length = $length;
+                    my $expected_uv = $allowed_uv;
+                    my $this_expected_len = $expected_len;
+                    my $this_needed_to_discern_len = $needed_to_discern_len;
+
                     # The overflow malformation test in the input
                     # array is coerced into being treated like one of
                     # the others.
@@ -704,11 +710,6 @@ foreach my $test (@tests) {
                     $malformations_name .= " malformation"
                                                 if $malformations_name;
                     $malformations_name .= "s" if @malformations > 1;
-                    my $this_bytes = $bytes;
-                    my $this_length = $length;
-                    my $expected_uv = $allowed_uv;
-                    my $this_expected_len = $expected_len;
-                    my $this_needed_to_discern_len = $needed_to_discern_len;
                     if ($malformations_name) {
                         $expected_uv = 0;
 
