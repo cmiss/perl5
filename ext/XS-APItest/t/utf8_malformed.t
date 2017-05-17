@@ -200,7 +200,7 @@ if (isASCII && ! $::is64bit) {    # 32-bit ASCII platform
             $::max_bytes, 1,
             [ qr/overflow/, qr/overlong/ ],
         ],
-        [ "overflow malformation",
+        [ "overflow malformation",  # 2**36
             "\xff\x80\x80\x80\x80\x80\x81\x80\x80\x80\x80\x80\x80",
             $::max_bytes,
             $::UTF8_ALLOW_OVERFLOW, $::UTF8_GOT_OVERFLOW,
@@ -211,7 +211,8 @@ if (isASCII && ! $::is64bit) {    # 32-bit ASCII platform
 }
 else { # 64-bit ASCII, or EBCDIC of any size.
     # On EBCDIC platforms, another overlong test is needed even on 32-bit
-    # systems, whereas it doesn't happen on ASCII except on 64-bit ones.
+    # systems because we go to the max_bytes representation at 31 bits,
+    # whereas on ASCII 32-bit platforms we never go to max_bytes at all.
 
     no warnings 'portable';
     no warnings 'overflow'; # Doesn't run on 32-bit systems, but compiles
@@ -377,6 +378,7 @@ foreach my $test (@malformations) {
     else {
         output_warnings(@warnings);
     }
+
     is($ret_ref->[2], $expected_error_flags,
        "$testname: utf8n_to_uvchr_error(), disallowed:"
      . " Returns expected error");
