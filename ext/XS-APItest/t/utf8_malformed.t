@@ -155,7 +155,9 @@ my @malformations = (
          ?              "\xfe\x80\x80\x80\x80\x80\x80"
          : I8_to_native("\xfe\xa0\xa0\xa0\xa0\xa0\xa0"),
         7,
-        $::UTF8_ALLOW_LONG, $::UTF8_GOT_LONG,
+        # The DISALLOW makes sure doesn't incorrectly think is above 31-bits
+        $::UTF8_ALLOW_LONG|$::UTF8_DISALLOW_ABOVE_31_BIT,
+        $::UTF8_GOT_LONG,
         0,   # NUL
         7, 2,
         qr/overlong/
@@ -165,7 +167,9 @@ my @malformations = (
          ?              "\xfe\x81\xbf\xbf\xbf\xbf\xbf"
          : I8_to_native("\xfe\xa1\xbf\xbf\xbf\xbf\xbf"),
         7,
-        $::UTF8_ALLOW_LONG, $::UTF8_GOT_LONG,
+        # The DISALLOW makes sure doesn't incorrectly think is above 31-bits
+        $::UTF8_ALLOW_LONG|$::UTF8_DISALLOW_ABOVE_31_BIT,
+        $::UTF8_GOT_LONG,
         (isASCII) ? 0x7FFFFFFF : 0x3FFFFFF,
         7, 2,
         qr/overlong/
