@@ -384,8 +384,8 @@ my @tests = (
             "\xff\xa0\xa0\xa0\xa0\xa0\xa0\xa2\xa0\xa0\xa0\xa0\xa0\xa0"),
         # This code point is chosen so that it is representable in a UV on
         # 32-bit machines
-        $::UTF8_WARN_ABOVE_31_BIT, $::UTF8_DISALLOW_ABOVE_31_BIT,
-        $::UTF8_GOT_ABOVE_31_BIT,
+        $::UTF8_WARN_PERL_EXTENDED, $::UTF8_DISALLOW_PERL_EXTENDED,
+        $::UTF8_GOT_PERL_EXTENDED,
         'utf8', 0x80000000,
         (isASCII) ? 7 : $::max_bytes,
         (isASCII) ? 1 : 8,
@@ -396,15 +396,15 @@ my @tests = (
          ?  "\xfe\x83\xbf\xbf\xbf\xbf\xbf"
          : I8_to_native(
             "\xff\xa0\xa0\xa0\xa0\xa0\xa0\xa3\xbf\xbf\xbf\xbf\xbf\xbf"),
-        $::UTF8_WARN_ABOVE_31_BIT, $::UTF8_DISALLOW_ABOVE_31_BIT,
-        $::UTF8_GOT_ABOVE_31_BIT,
+        $::UTF8_WARN_PERL_EXTENDED, $::UTF8_DISALLOW_PERL_EXTENDED,
+        $::UTF8_GOT_PERL_EXTENDED,
         'utf8', 0xFFFFFFFF,
         (isASCII) ? 7 : $::max_bytes,
         (isASCII) ? 1 : 8,
         nonportable_regex(0xffffffff)
     ],
     [ "requires at least 32 bits, and use SUPER-type flags, instead of"
-    . " ABOVE_31_BIT",
+    . " PERL_EXTENDED",
         (isASCII)
          ? "\xfe\x82\x80\x80\x80\x80\x80"
          : I8_to_native(
@@ -416,9 +416,9 @@ my @tests = (
         nonportable_regex(0x80000000)
     ],
     [ "overflow with warnings/disallow for more than 31 bits",
-        # This tests the interaction of WARN_ABOVE_31_BIT/DISALLOW_ABOVE_31_BIT
+        # This tests the interaction of WARN_PERL_EXTENDED/DISALLOW_PERL_EXTENDED
         # with overflow.  The overflow malformation is never allowed, so
-        # preventing it takes precedence if the ABOVE_31_BIT options would
+        # preventing it takes precedence if the PERL_EXTENDED options would
         # otherwise allow in an overflowing value.  The ASCII code points (1
         # for 32-bits; 1 for 64) were chosen because the old overflow
         # detection algorithm did not catch them; this means this test also
@@ -433,9 +433,9 @@ my @tests = (
            ?    "\xfe\x86\x80\x80\x80\x80\x80"
            : I8_to_native(
                 "\xff\xa0\xa0\xa0\xa0\xa0\xa0\xa4\xa0\xa0\xa0\xa0\xa0\xa0"))),
-        $::UTF8_WARN_ABOVE_31_BIT,
-        $::UTF8_DISALLOW_ABOVE_31_BIT,
-        $::UTF8_GOT_ABOVE_31_BIT,
+        $::UTF8_WARN_PERL_EXTENDED,
+        $::UTF8_DISALLOW_PERL_EXTENDED,
+        $::UTF8_GOT_PERL_EXTENDED,
         'utf8', 0,
         (! isASCII || $::is64bit) ? $::max_bytes : 7,
         (isASCII || $::is64bit) ? 2 : 8,
@@ -449,8 +449,8 @@ if (! $::is64bit) {
         push @tests,
             [ "Lowest 33 bit code point: overflow",
                 "\xFE\x84\x80\x80\x80\x80\x80",
-                $::UTF8_WARN_ABOVE_31_BIT, $::UTF8_DISALLOW_ABOVE_31_BIT,
-                $::UTF8_GOT_ABOVE_31_BIT,
+                $::UTF8_WARN_PERL_EXTENDED, $::UTF8_DISALLOW_PERL_EXTENDED,
+                $::UTF8_GOT_PERL_EXTENDED,
                 'utf8', 0x100000000,
                 7, 1,
                 qr/and( is)? not portable/
@@ -465,8 +465,8 @@ else {
             ?       "\xff\x80\x80\x80\x80\x80\x81\x80\x80\x80\x80\x80\x80"
             : I8_to_native(
                     "\xff\xa0\xa0\xa0\xa0\xa0\xa2\xa0\xa0\xa0\xa0\xa0\xa0\xa0"),
-            $::UTF8_WARN_ABOVE_31_BIT, $::UTF8_DISALLOW_ABOVE_31_BIT,
-            $::UTF8_GOT_ABOVE_31_BIT,
+            $::UTF8_WARN_PERL_EXTENDED, $::UTF8_DISALLOW_PERL_EXTENDED,
+            $::UTF8_GOT_PERL_EXTENDED,
             'utf8', 0x1000000000,
             $::max_bytes, (isASCII) ? 1 : 7,
             qr/and( is)? not portable/
@@ -477,8 +477,8 @@ else {
             [ "requires at least 32 bits",
                 I8_to_native(
                     "\xff\xa0\xa0\xa0\xa0\xa0\xa1\xa0\xa0\xa0\xa0\xa0\xa0\xa0"),
-                $::UTF8_WARN_ABOVE_31_BIT,$::UTF8_DISALLOW_ABOVE_31_BIT,
-                $::UTF8_GOT_ABOVE_31_BIT,
+                $::UTF8_WARN_PERL_EXTENDED,$::UTF8_DISALLOW_PERL_EXTENDED,
+                $::UTF8_GOT_PERL_EXTENDED,
                 'utf8', 0x800000000,
                 $::max_bytes, 7,
                 nonportable_regex(0x80000000)
@@ -486,8 +486,8 @@ else {
             [ "requires at least 32 bits",
                 I8_to_native(
                     "\xff\xa0\xa0\xa0\xa0\xa1\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0"),
-                $::UTF8_WARN_ABOVE_31_BIT,$::UTF8_DISALLOW_ABOVE_31_BIT,
-                $::UTF8_GOT_ABOVE_31_BIT,
+                $::UTF8_WARN_PERL_EXTENDED,$::UTF8_DISALLOW_PERL_EXTENDED,
+                $::UTF8_GOT_PERL_EXTENDED,
                 'utf8', 0x10000000000,
                 $::max_bytes, 6,
                 nonportable_regex(0x10000000000)
@@ -495,8 +495,8 @@ else {
             [ "requires at least 32 bits",
                 I8_to_native(
                     "\xff\xa0\xa0\xa0\xa1\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0"),
-                $::UTF8_WARN_ABOVE_31_BIT,$::UTF8_DISALLOW_ABOVE_31_BIT,
-                $::UTF8_GOT_ABOVE_31_BIT,
+                $::UTF8_WARN_PERL_EXTENDED,$::UTF8_DISALLOW_PERL_EXTENDED,
+                $::UTF8_GOT_PERL_EXTENDED,
                 'utf8', 0x200000000000,
                 $::max_bytes, 5,
                 nonportable_regex(0x20000000000)
@@ -504,8 +504,8 @@ else {
             [ "requires at least 32 bits",
                 I8_to_native(
                     "\xff\xa0\xa0\xa1\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0"),
-                $::UTF8_WARN_ABOVE_31_BIT,$::UTF8_DISALLOW_ABOVE_31_BIT,
-                $::UTF8_GOT_ABOVE_31_BIT,
+                $::UTF8_WARN_PERL_EXTENDED,$::UTF8_DISALLOW_PERL_EXTENDED,
+                $::UTF8_GOT_PERL_EXTENDED,
                 'utf8', 0x4000000000000,
                 $::max_bytes, 4,
                 nonportable_regex(0x4000000000000)
@@ -513,8 +513,8 @@ else {
             [ "requires at least 32 bits",
                 I8_to_native(
                     "\xff\xa0\xa1\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0"),
-                $::UTF8_WARN_ABOVE_31_BIT,$::UTF8_DISALLOW_ABOVE_31_BIT,
-                $::UTF8_GOT_ABOVE_31_BIT,
+                $::UTF8_WARN_PERL_EXTENDED,$::UTF8_DISALLOW_PERL_EXTENDED,
+                $::UTF8_GOT_PERL_EXTENDED,
                 'utf8', 0x80000000000000,
                 $::max_bytes, 3,
                 nonportable_regex(0x80000000000000)
@@ -522,8 +522,8 @@ else {
             [ "requires at least 32 bits",
                 I8_to_native(
                     "\xff\xa1\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0"),
-                $::UTF8_WARN_ABOVE_31_BIT,$::UTF8_DISALLOW_ABOVE_31_BIT,
-                $::UTF8_GOT_ABOVE_31_BIT,
+                $::UTF8_WARN_PERL_EXTENDED,$::UTF8_DISALLOW_PERL_EXTENDED,
+                $::UTF8_GOT_PERL_EXTENDED,
                 'utf8', 0x1000000000000000,
                 $::max_bytes, 2,
                 nonportable_regex(0x1000000000000000)
@@ -969,9 +969,9 @@ foreach my $test (@tests) {
                         elsif ($warn_flag == $::UTF8_WARN_SUPER) {
                             $uvchr_warn_flag = $::UNICODE_WARN_SUPER
                         }
-                        elsif ($warn_flag == $::UTF8_WARN_ABOVE_31_BIT) {
+                        elsif ($warn_flag == $::UTF8_WARN_PERL_EXTENDED) {
                             $uvchr_warn_flag
-                                        = $::UNICODE_WARN_ABOVE_31_BIT;
+                                        = $::UNICODE_WARN_PERL_EXTENDED;
                         }
                         else {
                             fail(sprintf "Unexpected warn flag: %x",
@@ -995,10 +995,10 @@ foreach my $test (@tests) {
                                         = $::UNICODE_DISALLOW_SUPER;
                         }
                         elsif ($disallow_flag
-                                        == $::UTF8_DISALLOW_ABOVE_31_BIT)
+                                        == $::UTF8_DISALLOW_PERL_EXTENDED)
                         {
                             $uvchr_disallow_flag =
-                                        $::UNICODE_DISALLOW_ABOVE_31_BIT;
+                                        $::UNICODE_DISALLOW_PERL_EXTENDED;
                         }
                         else {
                             fail(sprintf "Unexpected disallow flag: %x",
@@ -1013,7 +1013,7 @@ foreach my $test (@tests) {
                                             . (($uvchr_disallow_flag)
                                                 ? 'disallowed'
                                                 : ($disallowed)
-                                                ? 'ABOVE_31_BIT allowed'
+                                                ? 'PERL_EXTENDED allowed'
                                                 : 'allowed');
                     $this_name .= ", $eval_warn";
                     $this_name .= ", " . (($uvchr_warn_flag)

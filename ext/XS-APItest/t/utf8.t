@@ -32,8 +32,8 @@ my $look_for_everything_utf8n_to
 			| $::UTF8_WARN_NONCHAR
 			| $::UTF8_DISALLOW_SUPER
 			| $::UTF8_WARN_SUPER
-			| $::UTF8_DISALLOW_ABOVE_31_BIT
-			| $::UTF8_WARN_ABOVE_31_BIT;
+			| $::UTF8_DISALLOW_PERL_EXTENDED
+			| $::UTF8_WARN_PERL_EXTENDED;
 my $look_for_everything_uvchr_to
                         = $::UNICODE_DISALLOW_SURROGATE
 			| $::UNICODE_WARN_SURROGATE
@@ -41,8 +41,8 @@ my $look_for_everything_uvchr_to
 			| $::UNICODE_WARN_NONCHAR
 			| $::UNICODE_DISALLOW_SUPER
 			| $::UNICODE_WARN_SUPER
-			| $::UNICODE_DISALLOW_ABOVE_31_BIT
-			| $::UNICODE_WARN_ABOVE_31_BIT;
+			| $::UNICODE_DISALLOW_PERL_EXTENDED
+			| $::UNICODE_WARN_PERL_EXTENDED;
 
 foreach ([0, '', '', 'empty'],
 	 [0, 'N', 'N', '1 char'],
@@ -627,7 +627,7 @@ for my $u (sort { utf8::unicode_to_native($a) <=> utf8::unicode_to_native($b) }
         $valid_under_c9strict = 0;
         if ($n > 2 ** 31 - 1) {
             $this_utf8_flags &=
-                        ~($::UTF8_DISALLOW_ABOVE_31_BIT|$::UTF8_WARN_ABOVE_31_BIT);
+                        ~($::UTF8_DISALLOW_PERL_EXTENDED|$::UTF8_WARN_PERL_EXTENDED);
             $valid_for_fits_in_31_bits = 0;
         }
     }
@@ -784,7 +784,7 @@ for my $u (sort { utf8::unicode_to_native($a) <=> utf8::unicode_to_native($b) }
     my $this_uvchr_flags = $look_for_everything_uvchr_to;
     if ($n > 2 ** 31 - 1) {
         $this_uvchr_flags &=
-                ~($::UNICODE_DISALLOW_ABOVE_31_BIT|$::UNICODE_WARN_ABOVE_31_BIT);
+                ~($::UNICODE_DISALLOW_PERL_EXTENDED|$::UNICODE_WARN_PERL_EXTENDED);
     }
     if ($n > 0x10FFFF) {
         $this_uvchr_flags &= ~($::UNICODE_DISALLOW_SUPER|$::UNICODE_WARN_SUPER);
@@ -1008,7 +1008,7 @@ for my $restriction (sort keys %restriction_types) {
                                 $test .= ", $::UTF8_DISALLOW_ILLEGAL_INTERCHANGE";
                             }
                             elsif ($restriction eq "fits_in_31_bits") {
-                                $test .= ", $::UTF8_DISALLOW_ABOVE_31_BIT";
+                                $test .= ", $::UTF8_DISALLOW_PERL_EXTENDED";
                             }
                             else {
                                 fail("Internal test error: Unknown restriction "

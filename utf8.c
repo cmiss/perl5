@@ -205,20 +205,20 @@ Perl_uvoffuni_to_utf8_flags(pTHX_ U8 *d, UV uv, const UV flags)
                         cp_above_legal_max, uv, MAX_NON_DEPRECATED_CP);
         }
         if (   (flags & UNICODE_WARN_SUPER)
-            || (   UNICODE_IS_ABOVE_31_BIT(uv)
-                && (flags & UNICODE_WARN_ABOVE_31_BIT)))
+            || (   UNICODE_IS_PERL_EXTENDED(uv)
+                && (flags & UNICODE_WARN_PERL_EXTENDED)))
         {
             Perl_ck_warner_d(aTHX_ packWARN(WARN_NON_UNICODE),
 
               /* Choose the more dire applicable warning */
-              (UNICODE_IS_ABOVE_31_BIT(uv))
+              (UNICODE_IS_PERL_EXTENDED(uv))
               ? "Code point 0x%" UVXf " is not Unicode, and not portable"
               : "Code point 0x%" UVXf " is not Unicode, may not be portable",
              uv);
         }
         if (flags & UNICODE_DISALLOW_SUPER
-            || (   UNICODE_IS_ABOVE_31_BIT(uv)
-                && (flags & UNICODE_DISALLOW_ABOVE_31_BIT)))
+            || (   UNICODE_IS_PERL_EXTENDED(uv)
+                && (flags & UNICODE_DISALLOW_PERL_EXTENDED)))
         {
             return NULL;
         }
@@ -362,11 +362,11 @@ these that written by the perl interpreter; nor would Perl understand files
 written by something that uses a different extension.  For these reasons, there
 is a separate set of flags that can warn and/or disallow these extremely high
 code points, even if other above-Unicode ones are accepted.  These are the
-C<UNICODE_WARN_ABOVE_31_BIT> and C<UNICODE_DISALLOW_ABOVE_31_BIT> flags.  These
+C<UNICODE_WARN_PERL_EXTENDED> and C<UNICODE_DISALLOW_PERL_EXTENDED> flags.  These
 are entirely independent from the deprecation warning for code points above
 C<IV_MAX>.  On 32-bit machines, it will eventually be forbidden to have any
 code point that needs more than 31 bits to represent.  When that happens,
-effectively the C<UNICODE_DISALLOW_ABOVE_31_BIT> flag will always be set on
+effectively the C<UNICODE_DISALLOW_PERL_EXTENDED> flag will always be set on
 32-bit machines.  (Of course C<UNICODE_DISALLOW_SUPER> will treat all
 above-Unicode code points, including these, as malformations; and
 C<UNICODE_WARN_SUPER> warns on these.)
@@ -375,8 +375,8 @@ On EBCDIC platforms starting in Perl v5.24, the Perl extension for representing
 extremely high code points kicks in at 0x3FFF_FFFF (2**30 -1), which is lower
 than on ASCII.  Prior to that, code points 2**31 and higher were simply
 unrepresentable, and a different, incompatible method was used to represent
-code points between 2**30 and 2**31 - 1.  The flags C<UNICODE_WARN_ABOVE_31_BIT>
-and C<UNICODE_DISALLOW_ABOVE_31_BIT> have the same function as on ASCII
+code points between 2**30 and 2**31 - 1.  The flags C<UNICODE_WARN_PERL_EXTENDED>
+and C<UNICODE_DISALLOW_PERL_EXTENDED> have the same function as on ASCII
 platforms, warning and disallowing 2**31 and higher.
 
 =cut
@@ -651,7 +651,7 @@ Perl__is_utf8_char_helper(const U8 * const s, const U8 * e, const U32 flags)
     PERL_ARGS_ASSERT__IS_UTF8_CHAR_HELPER;
 
     assert(0 == (flags & ~(UTF8_DISALLOW_ILLEGAL_INTERCHANGE
-                          |UTF8_DISALLOW_ABOVE_31_BIT)));
+                          |UTF8_DISALLOW_PERL_EXTENDED)));
     assert(! UTF8_IS_INVARIANT(*s));
 
     /* A variant char must begin with a start byte */
@@ -701,7 +701,7 @@ Perl__is_utf8_char_helper(const U8 * const s, const U8 * e, const U32 flags)
             return 0;           /* Above Unicode */
         }
 
-        if (   (flags & UTF8_DISALLOW_ABOVE_31_BIT)
+        if (   (flags & UTF8_DISALLOW_PERL_EXTENDED)
             &&  UNLIKELY(is_utf8_cp_above_31_bits(s, e)))
         {
             return 0;           /* Above 31 bits */
@@ -926,11 +926,11 @@ these; nor would Perl understand files
 written by something that uses a different extension.  For these reasons, there
 is a separate set of flags that can warn and/or disallow these extremely high
 code points, even if other above-Unicode ones are accepted.  These are the
-C<UTF8_WARN_ABOVE_31_BIT> and C<UTF8_DISALLOW_ABOVE_31_BIT> flags.  These
+C<UTF8_WARN_PERL_EXTENDED> and C<UTF8_DISALLOW_PERL_EXTENDED> flags.  These
 are entirely independent from the deprecation warning for code points above
 C<IV_MAX>.  On 32-bit machines, it will eventually be forbidden to have any
 code point that needs more than 31 bits to represent.  When that happens,
-effectively the C<UTF8_DISALLOW_ABOVE_31_BIT> flag will always be set on
+effectively the C<UTF8_DISALLOW_PERL_EXTENDED> flag will always be set on
 32-bit machines.  (Of course C<UTF8_DISALLOW_SUPER> will treat all
 above-Unicode code points, including these, as malformations; and
 C<UTF8_WARN_SUPER> warns on these.)
@@ -939,8 +939,8 @@ On EBCDIC platforms starting in Perl v5.24, the Perl extension for representing
 extremely high code points kicks in at 0x3FFF_FFFF (2**30 -1), which is lower
 than on ASCII.  Prior to that, code points 2**31 and higher were simply
 unrepresentable, and a different, incompatible method was used to represent
-code points between 2**30 and 2**31 - 1.  The flags C<UTF8_WARN_ABOVE_31_BIT>
-and C<UTF8_DISALLOW_ABOVE_31_BIT> have the same function as on ASCII
+code points between 2**30 and 2**31 - 1.  The flags C<UTF8_WARN_PERL_EXTENDED>
+and C<UTF8_DISALLOW_PERL_EXTENDED> have the same function as on ASCII
 platforms, warning and disallowing 2**31 and higher.
 
 All other code points corresponding to Unicode characters, including private
@@ -985,12 +985,12 @@ exceptions are noted:
 
 =over 4
 
-=item C<UTF8_GOT_ABOVE_31_BIT>
+=item C<UTF8_GOT_PERL_EXTENDED>
 
 The code point represented by the input UTF-8 sequence occupies more than 31
 bits.
 This bit is set only if the input C<flags> parameter contains either the
-C<UTF8_DISALLOW_ABOVE_31_BIT> or the C<UTF8_WARN_ABOVE_31_BIT> flags.
+C<UTF8_DISALLOW_PERL_EXTENDED> or the C<UTF8_WARN_PERL_EXTENDED> flags.
 
 =item C<UTF8_GOT_CONTINUATION>
 
@@ -1271,11 +1271,11 @@ Perl_utf8n_to_uvchr_error(pTHX_ const U8 *s,
 	&& ((flags & ( UTF8_DISALLOW_NONCHAR
                       |UTF8_DISALLOW_SURROGATE
                       |UTF8_DISALLOW_SUPER
-                      |UTF8_DISALLOW_ABOVE_31_BIT
+                      |UTF8_DISALLOW_PERL_EXTENDED
 	              |UTF8_WARN_NONCHAR
                       |UTF8_WARN_SURROGATE
                       |UTF8_WARN_SUPER
-                      |UTF8_WARN_ABOVE_31_BIT))
+                      |UTF8_WARN_PERL_EXTENDED))
                    /* In case of a malformation, 'uv' is not valid, and has
                     * been changed to something in the Unicode range.
                     * Currently we don't output a deprecation message if there
@@ -1370,7 +1370,7 @@ Perl_utf8n_to_uvchr_error(pTHX_ const U8 *s,
                 /* Overflow means also got a super and above 31 bits, but we
                  * handle all three cases here */
                 possible_problems
-                  &= ~(UTF8_GOT_OVERFLOW|UTF8_GOT_SUPER|UTF8_GOT_ABOVE_31_BIT);
+                  &= ~(UTF8_GOT_OVERFLOW|UTF8_GOT_SUPER|UTF8_GOT_PERL_EXTENDED);
                 *errors |= UTF8_GOT_OVERFLOW;
 
                 /* But the API says we flag all errors found */
@@ -1378,15 +1378,15 @@ Perl_utf8n_to_uvchr_error(pTHX_ const U8 *s,
                     *errors |= UTF8_GOT_SUPER;
                 }
                 if (flags
-                        & (UTF8_WARN_ABOVE_31_BIT|UTF8_DISALLOW_ABOVE_31_BIT))
+                        & (UTF8_WARN_PERL_EXTENDED|UTF8_DISALLOW_PERL_EXTENDED))
                 {
-                    *errors |= UTF8_GOT_ABOVE_31_BIT;
+                    *errors |= UTF8_GOT_PERL_EXTENDED;
                 }
 
                 /* Disallow if any of the three categories say to */
                 if ( ! (flags & UTF8_ALLOW_OVERFLOW)
                     || (flags & ( UTF8_DISALLOW_SUPER
-                                 |UTF8_DISALLOW_ABOVE_31_BIT)))
+                                 |UTF8_DISALLOW_PERL_EXTENDED)))
                 {
                     disallowed = TRUE;
                 }
@@ -1396,7 +1396,7 @@ Perl_utf8n_to_uvchr_error(pTHX_ const U8 *s,
                  * are on, because this code point is above IV_MAX */
                 if (  ckWARN_d(WARN_DEPRECATED)
                     || ! (flags & UTF8_ALLOW_OVERFLOW)
-                    ||   (flags & (UTF8_WARN_SUPER|UTF8_WARN_ABOVE_31_BIT)))
+                    ||   (flags & (UTF8_WARN_SUPER|UTF8_WARN_PERL_EXTENDED)))
                 {
 
                     /* The warnings code explicitly says it doesn't handle the
@@ -1562,18 +1562,18 @@ Perl_utf8n_to_uvchr_error(pTHX_ const U8 *s,
                  * test for these after the regular SUPER ones, and before
                  * possibly bailing out, so that the slightly more dire warning
                  * will override the regular one. */
-                if (   (flags & (UTF8_WARN_ABOVE_31_BIT
+                if (   (flags & (UTF8_WARN_PERL_EXTENDED
                                 |UTF8_WARN_SUPER
-                                |UTF8_DISALLOW_ABOVE_31_BIT))
+                                |UTF8_DISALLOW_PERL_EXTENDED))
                     && (   (   UNLIKELY(orig_problems & UTF8_GOT_TOO_SHORT)
                             && UNLIKELY(is_utf8_cp_above_31_bits(
                                                                 adjusted_s0,
                                                                 adjusted_send)))
                         || (   LIKELY(! (orig_problems & UTF8_GOT_TOO_SHORT))
-                            && UNLIKELY(UNICODE_IS_ABOVE_31_BIT(uv)))))
+                            && UNLIKELY(UNICODE_IS_PERL_EXTENDED(uv)))))
                 {
                     if (  ! (flags & UTF8_CHECK_ONLY)
-                        &&  (flags & (UTF8_WARN_ABOVE_31_BIT|UTF8_WARN_SUPER))
+                        &&  (flags & (UTF8_WARN_PERL_EXTENDED|UTF8_WARN_SUPER))
                         &&  ckWARN_d(WARN_UTF8))
                     {
                         pack_warn = packWARN(WARN_UTF8);
@@ -1593,12 +1593,12 @@ Perl_utf8n_to_uvchr_error(pTHX_ const U8 *s,
                         }
                     }
 
-                    if (flags & ( UTF8_WARN_ABOVE_31_BIT
-                                 |UTF8_DISALLOW_ABOVE_31_BIT))
+                    if (flags & ( UTF8_WARN_PERL_EXTENDED
+                                 |UTF8_DISALLOW_PERL_EXTENDED))
                     {
-                        *errors |= UTF8_GOT_ABOVE_31_BIT;
+                        *errors |= UTF8_GOT_PERL_EXTENDED;
 
-                        if (flags & UTF8_DISALLOW_ABOVE_31_BIT) {
+                        if (flags & UTF8_DISALLOW_PERL_EXTENDED) {
                             disallowed = TRUE;
                         }
                     }
