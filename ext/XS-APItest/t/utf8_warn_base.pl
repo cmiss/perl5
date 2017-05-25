@@ -690,7 +690,6 @@ foreach my $test (@tests) {
                     push @malformations, $short if $short;
                     push @malformations, $unexpected_noncont
                                                       if $unexpected_noncont;
-                    push @malformations, $overlong if $overlong;
 
                     my $this_bytes = $bytes;
                     my $this_length = $length;
@@ -707,16 +706,14 @@ foreach my $test (@tests) {
                         push @expected_errors, $::UTF8_GOT_OVERFLOW;
                     }
 
-                    my $malformations_name = join "/", @malformations;
-                    $malformations_name .= " malformation"
-                                                if $malformations_name;
-                    $malformations_name .= "s" if @malformations > 1;
-                    if ($malformations_name) {
-                        $expected_uv = 0;
+                    my $warning_contains_code_point
+                        = ! ($short || $unexpected_noncont || $will_overflow);
+
+                    if ($overlong) {
+                        push @malformations, $overlong;
 
                         # Coerce the input into the desired
                         # malformation
-                        if ($malformations_name =~ /overlong/) {
 
                             # For an overlong, we convert the original
                             # start byte into a continuation byte with
@@ -741,6 +738,13 @@ foreach my $test (@tests) {
                             $this_expected_len = $::max_bytes;
                             push @expected_errors, $::UTF8_GOT_LONG;
                         }
+                    my $expected_error_uv = sprintf("%04X", $allowed_uv);
+
+                    my $malformations_name = join "/", @malformations;
+                    $malformations_name .= " malformation"
+                                                if $malformations_name;
+                    $malformations_name .= "s" if @malformations > 1;
+                    if ($malformations_name) {
                         if ($malformations_name =~ /short/) {
 
                             # Just tell the test to not look far
@@ -770,9 +774,9 @@ foreach my $test (@tests) {
                                     . " no warnings '$warning'");
 
                     # Is effectively disallowed if we've set up a
-                    # malformation, even if the flag indicates it is
-                    # allowed.  Fix up test name to indicate this as
-                    # well
+                    # malformation (unless that malformation is allowed), even
+                    # if the flag indicates it is allowed.  Fix up test name
+                    # to indicate this as well
                     my $disallowed = $disallow_flag
                                 || $malformations_name;
                     my $this_name = "utf8n_to_uvchr_error() $testname: "
@@ -859,6 +863,12 @@ foreach my $test (@tests) {
                                 if ($warnings[$i] =~ /$malformation/) {
                                     pass("Expected and got"
                                     . " '$malformation' warning");
+                                    if ($warning_contains_code_point) {
+                                        like($warnings[$i],
+                                             qr/$expected_error_uv/,
+                                             "... and warning has correct"
+                                           . " code point");
+                                    }
                                     splice @warnings, $i, 1;
                                     next MALFORMATION;
                                 }
@@ -888,6 +898,10 @@ foreach my $test (@tests) {
                             like($warnings[0], $message,
                                     "$this_name: Got expected warning")
                                 or diag $call;
+                            if ($warning_contains_code_point) {
+                                like($warnings[0], qr/$expected_error_uv/,
+                                     "Got expected code point in warning");
+                            }
                         }
                         else {
                             diag $call;
