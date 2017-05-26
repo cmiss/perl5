@@ -2383,7 +2383,7 @@ issued since Perl 5.18.
 Several new macros for analysing the validity of utf8 sequences. These
 are:
 
-L<C<UTF8_GOT_ABOVE_31_BIT>|perlapi/UTF8_GOT_ABOVE_31_BIT>
+C<UTF8_GOT_ABOVE_31_BIT>
 L<C<UTF8_GOT_CONTINUATION>|perlapi/UTF8_GOT_CONTINUATION>
 L<C<UTF8_GOT_EMPTY>|perlapi/UTF8_GOT_EMPTY>
 L<C<UTF8_GOT_LONG>|perlapi/UTF8_GOT_LONG>
