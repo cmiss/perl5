@@ -20,8 +20,8 @@
 # Set these to wherever you want "nmake install" to put your
 # newly built perl.
 #
-INST_DRV	= c:
-INST_TOP	= $(INST_DRV)\perl
+INST_DRV	= d:
+INST_TOP	= $(INST_DRV)\work\cmiss_setup\mine_perl
 
 #
 # Uncomment if you want to build a 32-bit Perl using a 32-bit compiler
@@ -112,7 +112,7 @@ DEFAULT_INC_EXCLUDES_DOT = define
 # uncomment exactly one of the following
 #
 # Visual C++ 6.0 (aka Visual C++ 98)
-CCTYPE		= MSVC60
+#CCTYPE		= MSVC60
 # Visual C++ .NET 2002/2003 (aka Visual C++ 7.0/7.1) (full version)
 #CCTYPE		= MSVC70
 # Visual C++ Toolkit 2003 (aka Visual C++ 7.1) (free command-line tools)
@@ -140,7 +140,7 @@ CCTYPE		= MSVC60
 # Visual C++ 2013 Express Edition (aka Visual C++ 12.0) (free version)
 #CCTYPE		= MSVC120FREE
 # Visual C++ 2015 (aka Visual C++ 14.0) (full version)
-#CCTYPE		= MSVC140
+CCTYPE		= MSVC140
 # Visual C++ 2015 Express Edition (aka Visual C++ 14.0) (free version)
 #CCTYPE		= MSVC140FREE
 
@@ -205,7 +205,7 @@ CCTYPE		= MSVC60
 # variables below. A static library perl526s.lib will also be created.
 # Ordinary perl.exe is not affected by this option.
 #
-#BUILD_STATIC	= define
+BUILD_STATIC	= define
 
 #
 # in addition to BUILD_STATIC the option ALL_STATIC makes *every*
